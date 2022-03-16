@@ -28,7 +28,7 @@ optional_requirements = {}
 
 setup(
     name="compas_notebook",
-    version="0.1.0",
+    version="0.2.0",
     description="Display compas geometries in jupyter notebook.",
     long_description=long_description,
     long_description_content_type="text/markdown",

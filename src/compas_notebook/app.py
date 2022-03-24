@@ -55,6 +55,7 @@ class App(trimesh.Scene):
         if show_faces:
             faces = np.array(faces)
             faces_backside = np.flip(faces, axis=1)
+            faces_backside = np.roll(faces_backside, 1, axis=1)
             faces = np.concatenate((faces, faces_backside), axis=0)
             _faces = trimesh.Trimesh(vertices=vertices, faces=faces)
             if facecolor:

@@ -18,7 +18,7 @@ class App(trimesh.Scene):
         mesh = Mesh.from_shape(shape)
         return self.convert_mesh(mesh, **kwargs)
 
-    def convert_network(self, network: Network, 
+    def convert_network(self, network: Network,
                         pointcolor: Union[Dict[str, Color], Color] = Color.black(), linecolor: Union[Dict[str, Color], Color] = Color.grey(),
                         show_points: bool = True, show_lines: bool = True,
                         pointsize: float = 0.1):
@@ -48,7 +48,9 @@ class App(trimesh.Scene):
         return geometries
 
     def convert_mesh(self, mesh: Mesh,
-                     facecolor: Union[Dict[str, Color], Color] = Color.white(), pointcolor: Union[Dict[str, Color], Color] = Color.black(), linecolor: Union[Dict[str, Color], Color] = Color.grey(),
+                     facecolor: Union[Dict[str, Color], Color] = Color.white(),
+                     pointcolor: Union[Dict[str, Color], Color] = Color.black(),
+                     linecolor: Union[Dict[str, Color], Color] = Color.grey(),
                      show_points: bool = False, show_lines: bool = True, show_faces: bool = True,
                      pointsize: float = 0.1):
 
@@ -85,7 +87,7 @@ class App(trimesh.Scene):
                     tri_vertices.append(vertices[face[2]])
                     tri_faces.append([vi, vi+1, vi+2])
                     tri_face_colors.append(facecolor[i])
-                    vi+=3
+                    vi += 3
                 else:
                     raise NotImplementedError("Only triangular and quad faces are supported.")
 

@@ -4,6 +4,7 @@ from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.datastructures import Network
 from compas.geometry import Shape
+from compas.geometry import Primitive, Line, Polygon
 from typing import Union, Dict
 
 
@@ -13,6 +14,34 @@ class App(trimesh.Scene):
         geometries = self.to_trimesh_geometries(item, **kwargs)
         for geometry in geometries:
             super().add_geometry(geometry)
+
+    def convert_primitive(self, primitive: Primitive, **kwargs):
+        if isinstance(primitive, Line):
+            return self.convert_line(primitive, **kwargs)
+        elif isinstance(primitive, Polygon):
+            return self.convert_polygon(primitive, **kwargs)
+        else:
+            raise NotImplementedError
+
+    def convert_line(self, line: Line, linecolor: Color = Color.black()):
+        vertices = list(line)
+        line = trimesh.path.entities.Line(points=[0, 1])
+        path = trimesh.path.Path3D(vertices=vertices, entities=[line], process=False)
+        path.colors = [linecolor]
+        return [path]
+
+    def convert_polygon(self, polygon: Polygon, linecolor: Color = Color.black()):
+        lines = []
+        vi = 0
+        vertices = []
+        for line in polygon.lines:
+            vertices.extend(list(line))
+            line = trimesh.path.entities.Line(points=[vi, vi+1])
+            lines.append(line)
+            vi += 2
+        path = trimesh.path.Path3D(vertices=vertices, entities=lines, process=False)
+        path.colors = [linecolor for _ in polygon.lines]
+        return [path]
 
     def convert_shape(self, shape: Shape, **kwargs):
         mesh = Mesh.from_shape(shape)
@@ -138,5 +167,7 @@ class App(trimesh.Scene):
             return self.convert_network(item, **kwargs)
         elif isinstance(item, Shape):
             return self.convert_shape(item, **kwargs)
+        elif isinstance(item, Primitive):
+            return self.convert_primitive(item, **kwargs)
         else:
             raise NotImplementedError

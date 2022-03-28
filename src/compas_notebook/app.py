@@ -131,6 +131,8 @@ class App(trimesh.Scene):
             geometries.append(_faces)
 
         if show_lines:
+            vi = 0
+            line_vertices = []
             lines = []
             if isinstance(linecolor, dict):
                 pass
@@ -138,10 +140,15 @@ class App(trimesh.Scene):
                 linecolor = {edge: linecolor for edge in mesh.edges()}
             linecolors = []
             for v1, v2 in mesh.edges():
-                line = trimesh.path.entities.Line(points=[v1, v2])
-                lines.append(line)
                 linecolors.append(linecolor[(v1, v2)])
-            path = trimesh.path.Path3D(vertices=vertices, entities=lines, process=False)
+                v1 = mesh.vertex_attributes(v1, "xyz")
+                v2 = mesh.vertex_attributes(v2, "xyz")
+                line_vertices.append(v1)
+                line_vertices.append(v2)
+                line = trimesh.path.entities.Line(points=[vi, vi+1])
+                lines.append(line)
+                vi += 2
+            path = trimesh.path.Path3D(vertices=line_vertices, entities=lines, process=False)
             path.colors = linecolors
             geometries.append(path)
 

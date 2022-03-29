@@ -18,4 +18,5 @@ sphinx >=3.4
 twine
 wheel
 matplotlib
+jinja2 >= 3.0
 -e .

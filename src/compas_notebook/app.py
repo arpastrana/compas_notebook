@@ -5,6 +5,8 @@ from compas.datastructures import Mesh
 from compas.datastructures import Network
 from compas.geometry import Shape
 from compas.geometry import Primitive, Line, Polygon
+from compas.geometry import centroid_points
+from compas.utilities import pairwise
 from typing import Union, Dict
 
 
@@ -30,18 +32,9 @@ class App(trimesh.Scene):
         path.colors = [linecolor]
         return [path]
 
-    def convert_polygon(self, polygon: Polygon, linecolor: Color = Color.black()):
-        lines = []
-        vi = 0
-        vertices = []
-        for line in polygon.lines:
-            vertices.extend(list(line))
-            line = trimesh.path.entities.Line(points=[vi, vi+1])
-            lines.append(line)
-            vi += 2
-        path = trimesh.path.Path3D(vertices=vertices, entities=lines, process=False)
-        path.colors = [linecolor for _ in polygon.lines]
-        return [path]
+    def convert_polygon(self, polygon: Polygon, **kwargs):
+        mesh = Mesh.from_polygons([polygon])
+        return self.convert_mesh(mesh, **kwargs)
 
     def convert_shape(self, shape: Shape, **kwargs):
         mesh = Mesh.from_shape(shape)
@@ -117,8 +110,18 @@ class App(trimesh.Scene):
                     tri_faces.append([vi, vi+1, vi+2])
                     tri_face_colors.append(facecolor[i])
                     vi += 3
+                elif len(face) > 4:
+                    face_vertices = [vertices[v] for v in face]
+                    c = centroid_points(face_vertices)
+                    for a, b in pairwise(face_vertices + face_vertices[:1]):
+                        tri_vertices.append(a)
+                        tri_vertices.append(b)
+                        tri_vertices.append(c)
+                        tri_faces.append([vi, vi+1, vi+2])
+                        tri_face_colors.append(facecolor[i])
+                        vi += 3
                 else:
-                    raise NotImplementedError("Only triangular and quad faces are supported.")
+                    raise ValueError('Invalid face length: {}'.format(len(face)))
 
             tri_face_colors += tri_face_colors
             tri_face_colors = trimesh.visual.to_rgba(tri_face_colors)
